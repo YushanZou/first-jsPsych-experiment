@@ -1,0 +1,65 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+  
+---
+# install packages
+```{r}
+#install.packages ("tidyverse", dependencies = TRUE)
+#install.packages ("ggthemes", dependencies =TRUE)
+
+
+```
+# load packages
+```{r}
+library(tidyverse)
+library (ggthemes)
+```
+# import data
+```{r}
+exp1 = read_csv("exp1.csv")
+nrow(exp1) #number of rows
+ncol(exp1) #number of columns
+colnames(exp1) #column names
+hist(exp1$rt)
+```
+# tidyverse verbs
+```{r}
+condition_data =
+exp1 %>% select(subject, rt, typeoftrial, trialcondition, correct) %>%
+filter(typeoftrial == "picture" & 
+trialcondition %in% c("Heavy_Normal","Light_Smashed","Heavy_Smashed","Light_Normal")) 
+
+means = condition_data %>%
+group_by(trialcondition)%>%
+summarise(mean_rt = mean(rt),
+sd_rt = sd(rt),
+mean_acc = mean(correct))
+```
+# plotting 
+```{r}
+condition_data %>%
+filter(rt < 25000) %>%
+ggplot(aes(x = rt)) +
+geom_histogram(binwidth = 1000,
+fill = "red", color = "black",
+position = "identity")+theme_few()+
+xlab("RT (in milliseconds)") +
+ylab ("Count")+
+ggtitle("Histogram of RT")
+```
+# plotting mean
+```{r}
+means %>%
+ggplot(aes(x = trialcondition, y = mean_rt)) +
+geom_bar(stat = "identity", fill="red", color='black')+
+theme_fivethirtyeight()+
+xlab("RT (in milliseconds)") +
+ylab ("Count")+
+ggtitle("Barplot of RT")
+
+```
+
+
